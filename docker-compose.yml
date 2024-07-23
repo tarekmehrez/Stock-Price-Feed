@@ -1,0 +1,48 @@
+version: "3.3"
+services:
+  app:
+    build: .
+    command: /app/bin/entrypoint.sh --wait --dev
+    container_name: feed_service
+    environment:
+      - DEVELOPMENT=1
+      - REDIS_TYPE=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SOCKET_HOST=partner
+      - SOCKET_PORT=8080
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - APPLICATION_PORT=8000
+      - APPLICATION_WORKERS=3
+      - ENV=dev
+    depends_on:
+      - redis
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6739
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+
+  partner:
+    build: ./resources
+    container_name: partner_socket
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
